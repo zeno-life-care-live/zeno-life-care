@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ZenoLife Care • Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="blossom-bg">
+<div class="petals" aria-hidden="true"></div>
+<div id="adminLogin" class="auth-shell">
+  <section class="brand-card glass"><div class="logo">Z<span>✿</span></div><h1>ZenoLife Care</h1><p>Secure Admin Console</p></section>
+  <section class="login-card glass">
+    <div class="eyebrow">ADMIN LOGIN</div><h2>Control Center</h2>
+    <form id="adminLoginForm">
+      <label>Admin Email<input id="adminEmail" type="email" required></label>
+      <label>Password<input id="adminPassword" type="password" required></label>
+      <button class="primary" type="submit">Enter Admin Panel <span>→</span></button>
+    </form>
+    <p id="adminLoginMsg" class="message"></p>
+  </section>
+</div>
+
+<div id="adminApp" hidden>
+<header class="topbar glass">
+  <div class="brand-mini"><span class="logo small">✿</span><div><b>ZenoLife Care</b><small>Admin Control Center</small></div></div>
+  <div class="top-actions"><button id="adminLogout" class="ghost">Logout</button></div>
+</header>
+<main class="container">
+  <section class="stats">
+    <div class="stat glass"><span>Medicines</span><b id="statMedicines">0</b></div>
+    <div class="stat glass"><span>Customers</span><b id="statCustomers">0</b></div>
+    <div class="stat glass"><span>New Orders</span><b id="statOrders">0</b></div>
+  </section>
+  <nav class="tabs glass">
+    <button class="tab active" data-tab="adminMedicines">Medicines</button>
+    <button class="tab" data-tab="adminCustomers">Customers</button>
+    <button class="tab" data-tab="adminOrders">Orders</button>
+  </nav>
+
+  <section id="adminMedicinesTab" class="tab-panel">
+    <div class="section-head"><div><div class="eyebrow">INVENTORY</div><h2>Medicine List</h2></div><button id="addMedicineBtn" class="primary">+ Add Medicine</button></div>
+    <div class="toolbar glass"><div class="search-wrap">⌕<input id="adminMedicineSearch" placeholder="Search medicine..."></div></div>
+    <div id="adminMedicineTable" class="table-card glass"></div>
+  </section>
+
+  <section id="adminCustomersTab" class="tab-panel" hidden>
+    <div class="section-head"><div><div class="eyebrow">CUSTOMER ACCESS</div><h2>Medical Customers</h2></div><button id="addCustomerBtn" class="primary">+ Add Customer</button></div>
+    <div id="customerTable" class="table-card glass"></div>
+  </section>
+
+  <section id="adminOrdersTab" class="tab-panel" hidden>
+    <div class="section-head"><div><div class="eyebrow">ORDERS</div><h2>Incoming Orders</h2></div></div>
+    <div id="orderTable" class="table-card glass"></div>
+  </section>
+</main>
+</div>
+
+<dialog id="medicineDialog" class="dialog"><form method="dialog" id="medicineForm" class="dialog-card wide">
+  <button type="button" class="close" id="closeMedicine">×</button>
+  <div class="eyebrow">INVENTORY</div><h2 id="medicineDialogTitle">Add Medicine</h2>
+  <input type="hidden" id="medicineId">
+  <div class="form-grid">
+    <label>Medicine Name<input id="mName" required></label>
+    <label>Quantity<input id="mQty" type="number" min="0" required></label>
+    <label>Expiry<input id="mExp" type="date" required></label>
+    <label>MRP<input id="mMrp" type="number" min="0" step="0.01" required></label>
+    <label>Sell Rate<input id="mSell" type="number" min="0" step="0.01" required></label>
+    <label>Purchase Rate<input id="mPurchase" type="number" min="0" step="0.01" required></label>
+    <label>GST %<input id="mGst" type="number" min="0" step="0.01" value="0" required></label>
+    <label>Transport Charges<input id="mTransport" type="number" min="0" step="0.01" value="0" required></label>
+  </div>
+  <label class="switch-row"><input id="mAvailable" type="checkbox" checked><span>Customer can order this medicine (stock toggle)</span></label>
+  <button class="primary" type="submit">Save Medicine</button>
+  <p id="medicineMsg" class="message"></p>
+</form></dialog>
+
+<dialog id="customerDialog" class="dialog"><form method="dialog" id="customerForm" class="dialog-card">
+  <button type="button" class="close" id="closeCustomer">×</button>
+  <div class="eyebrow">CUSTOMER REGISTRATION</div><h2>Create Customer Login</h2>
+  <label>Medical Name<input id="cMedical" required></label>
+  <label>Customer Name<input id="cName" required></label>
+  <label>Mobile Number<input id="cPhone" inputmode="tel" required></label>
+  <label>Login ID<input id="cLogin" required pattern="[A-Za-z0-9._-]{3,30}"></label>
+  <label>Password<input id="cPassword" type="password" minlength="6" required></label>
+  <button class="primary" type="submit">Create Customer</button>
+  <p id="customerMsg" class="message"></p>
+</form></dialog>
+<script type="module" src="admin.js"></script>
+</body>
+</html>
