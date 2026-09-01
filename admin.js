@@ -2,7 +2,7 @@ import { auth, db, firebaseConfig, customerEmailFromLogin } from "./firebase.js"
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import {
- collection, doc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, getDoc
+ collection, doc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, getDoc, deleteField
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const $=s=>document.querySelector(s);
@@ -28,7 +28,19 @@ async function loadAll(){ await Promise.all([loadMedicines(),loadCustomers(),loa
 
 async function loadMedicines(){
  const s=await getDocs(query(collection(db,"medicines"),orderBy("name")));
- medicines=s.docs.map(d=>({id:d.id,...d.data()})); renderMedicines();
+ const privateSnap=await getDocs(collection(db,"medicinePrivate"));
+ const privateMap=new Map(privateSnap.docs.map(d=>[d.id,d.data()]));
+ medicines=s.docs.map(d=>({id:d.id,...d.data(),...(privateMap.get(d.id)||{})}));
+ renderMedicines();
+ // One-time migration for medicines saved by older versions.
+ for(const d of s.docs){
+  const x=d.data();
+  if(x.purchaseRate!==undefined || x.gst!==undefined || x.transport!==undefined){
+   await setDoc(doc(db,"medicinePrivate",d.id),{purchaseRate:Number(x.purchaseRate||0),gst:Number(x.gst||0),transport:Number(x.transport||0),updatedAt:serverTimestamp()},{merge:true});
+   await updateDoc(doc(db,"medicines",d.id),{purchaseRate:deleteField(),gst:deleteField(),transport:deleteField()});
+  }
+ }
+ if(s.docs.some(d=>d.data().purchaseRate!==undefined || d.data().gst!==undefined || d.data().transport!==undefined)) await loadMedicines();
 }
 async function loadCustomers(){
  const s=await getDocs(collection(db,"customers")); customers=s.docs.map(d=>({id:d.id,...d.data()})); renderCustomers();
@@ -68,27 +80,63 @@ $("#adminLogout").onclick=()=>signOut(auth);
 
 $("#medicineForm").addEventListener("submit",async e=>{
  e.preventDefault();
- const data={
+ const imageFile=$("#mImage").files[0];
+ const publicData={
   name:$("#mName").value.trim(), quantity:Number($("#mQty").value), expiry:$("#mExp").value,
-  mrp:Number($("#mMrp").value), sellRate:Number($("#mSell").value), purchaseRate:Number($("#mPurchase").value),
-  gst:Number($("#mGst").value), transport:Number($("#mTransport").value), available:$("#mAvailable").checked,
+  mrp:Number($("#mMrp").value), sellRate:Number($("#mSell").value), available:$("#mAvailable").checked,
   updatedAt:serverTimestamp()
  };
+ const privateData={purchaseRate:Number($("#mPurchase").value),gst:Number($("#mGst").value),transport:Number($("#mTransport").value),updatedAt:serverTimestamp()};
+ if(imageFile) publicData.imageData=await compressImage(imageFile);
  try{
-  const id=$("#medicineId").value;
-  if(id) await updateDoc(doc(db,"medicines",id),data); else await addDoc(collection(db,"medicines"),{...data,createdAt:serverTimestamp()});
+  let id=$("#medicineId").value;
+  if(id){
+   await updateDoc(doc(db,"medicines",id),publicData);
+  }else{
+   const ref=await addDoc(collection(db,"medicines"),{...publicData,createdAt:serverTimestamp()});
+   id=ref.id;
+  }
+  await setDoc(doc(db,"medicinePrivate",id),privateData,{merge:true});
   $("#medicineDialog").close(); await loadMedicines(); stats();
- }catch(err){$("#medicineMsg").textContent="Save failed. Check Firestore rules."}
+ }catch(err){$("#medicineMsg").textContent=err?.message||"Save failed. Check Firestore rules."}
 });
 
 function openMedicine(m=null){
  $("#medicineForm").reset(); $("#medicineId").value=m?.id||"";
+ $("#mImagePreview").hidden=true; $("#mImagePreview").removeAttribute("src");
  $("#medicineDialogTitle").textContent=m?"Edit Medicine":"Add Medicine";
- if(m){$("#mName").value=m.name;$("#mQty").value=m.quantity;$("#mExp").value=m.expiry;$("#mMrp").value=m.mrp;$("#mSell").value=m.sellRate;$("#mPurchase").value=m.purchaseRate;$("#mGst").value=m.gst;$("#mTransport").value=m.transport;$("#mAvailable").checked=!!m.available}
+ if(m){$("#mName").value=m.name;$("#mQty").value=m.quantity;$("#mExp").value=m.expiry;$("#mMrp").value=m.mrp;$("#mSell").value=m.sellRate;$("#mPurchase").value=m.purchaseRate;$("#mGst").value=m.gst;$("#mTransport").value=m.transport;$("#mAvailable").checked=!!m.available; if(m.imageData){$("#mImagePreview").src=m.imageData;$("#mImagePreview").hidden=false}}
  $("#medicineDialog").showModal();
 }
+async function compressImage(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  reader.onerror=()=>reject(new Error("Image read failed"));
+  reader.onload=()=>{
+   const img=new Image();
+   img.onerror=()=>reject(new Error("Invalid image"));
+   img.onload=()=>{
+    const max=700, scale=Math.min(1,max/Math.max(img.width,img.height));
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.max(1,Math.round(img.width*scale)); canvas.height=Math.max(1,Math.round(img.height*scale));
+    canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+    const data=canvas.toDataURL("image/jpeg",0.72);
+    if(data.length>850000) return reject(new Error("Image too large. Choose a smaller photo."));
+    resolve(data);
+   };
+   img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+ });
+}
+$("#mImage").addEventListener("change",()=>{
+ const file=$("#mImage").files[0];
+ if(!file){return}
+ const url=URL.createObjectURL(file);
+ $("#mImagePreview").src=url; $("#mImagePreview").hidden=false;
+});
 function editMedicine(id){openMedicine(medicines.find(m=>m.id===id))}
-async function deleteMedicine(id){if(!confirm("Delete this medicine?"))return;await deleteDoc(doc(db,"medicines",id));await loadMedicines();stats()}
+async function deleteMedicine(id){if(!confirm("Delete this medicine?"))return;await deleteDoc(doc(db,"medicines",id));await deleteDoc(doc(db,"medicinePrivate",id));await loadMedicines();stats()}
 async function toggleStock(id){const m=medicines.find(x=>x.id===id);await updateDoc(doc(db,"medicines",id),{available:!m.available,updatedAt:serverTimestamp()});await loadMedicines()}
 async function updateOrderStatus(id,status){await updateDoc(doc(db,"orders",id),{status,updatedAt:serverTimestamp()});await loadOrders();stats()}
 
