@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ZenoLife Care • Customer Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="blossom-bg">
+  <div class="petals" aria-hidden="true"></div>
+  <main class="auth-shell">
+    <section class="brand-card glass">
+      <div class="logo">Z<span>✿</span></div>
+      <h1>ZenoLife Care</h1>
+      <p>Medical Retailer Customer Portal</p>
+    </section>
+
+    <section class="login-card glass">
+      <div class="eyebrow">CUSTOMER LOGIN</div>
+      <h2>Welcome back</h2>
+      <p class="muted">Login with the ID provided by your medical retailer.</p>
+      <form id="loginForm">
+        <label>Login ID<input id="loginId" required autocomplete="username" placeholder="e.g. rahul01"></label>
+        <label>Password<input id="password" type="password" required autocomplete="current-password" placeholder="Your password"></label>
+        <button class="primary" type="submit">Login <span>→</span></button>
+      </form>
+      <p id="loginMsg" class="message"></p>
+      <div class="small-links"><a href="admin.html">Admin Panel</a></div>
+    </section>
+  </main>
+  <script type="module" src="customer-login.js"></script>
+</body>
+</html>
