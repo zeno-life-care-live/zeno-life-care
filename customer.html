@@ -10,7 +10,7 @@
 <div class="petals" aria-hidden="true"></div>
 <header class="topbar glass">
   <div class="brand-mini"><span class="logo small">✿</span><div><b>ZenoLife Care</b><small id="medicalName">Customer Portal</small></div></div>
-  <div class="top-actions"><span class="pill" id="customerName"></span><button id="logoutBtn" class="ghost">Logout</button></div>
+  <div class="top-actions"><span class="pill" id="customerName"></span><button id="supportBtn" class="ghost" type="button">Customer Support</button><button id="logoutBtn" class="ghost">Logout</button></div>
 </header>
 
 <main class="container">
@@ -42,6 +42,17 @@
     <div id="ordersList" class="orders-list"></div>
   </section>
 </main>
+
+<dialog id="supportDialog" class="dialog">
+  <div class="dialog-card support-card">
+    <button type="button" class="close" id="closeSupport">×</button>
+    <div class="eyebrow">CUSTOMER SUPPORT</div>
+    <h2>Need help?</h2>
+    <p class="muted">Order ya kisi bhi problem ke liye humse contact karein.</p>
+    <a class="primary support-link" href="tel:9934872568">📞 Call: 9934872568</a>
+    <a class="ghost support-link" href="mailto:bhaiajju44765@gmail.com">✉ Email: bhaiajju44765@gmail.com</a>
+  </div>
+</dialog>
 
 <dialog id="orderDialog" class="dialog">
   <form method="dialog" id="orderForm" class="dialog-card">
