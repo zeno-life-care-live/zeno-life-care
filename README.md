@@ -1,17 +1,29 @@
-# Zeno Life Care — FREE version
+# ZenoLife Care FREE v6
 
-This version does **not** use Cloud Functions and does not require the Firebase Blaze plan.
+Premium Blossom-style medicine retailer/customer portal using Firebase Authentication + Firestore, designed to stay on Firebase Spark/free plan (no Cloud Functions).
 
-## Firebase
-1. Authentication → Sign-in method → Email/Password → Enable.
-2. Firestore Database → Create database.
-3. Publish the included `firestore.rules`.
-4. Keep the existing admin account/admin custom claim that was already configured.
+Features:
+- Separate Admin login and dashboard with session persistence
+- Medicine image add/update, category, composition, stock, expiry, MRP, sell/N. Rate
+- Purchase Rate, GST and Transport stored in admin-only medicinePrivate collection
+- Customer search by medicine name or composition
+- Category filters, cart, multi-item order summary, order cancellation and order history
+- Customer support call/email
+- Customer profile and password change
+- Admin customer create + block/unblock access
+- Admin order status workflow and stock deduction on completion
+- Low-stock and expiry alerts
+- CSV export for medicines and orders
+- Separate drug details page
 
-## Customer accounts
-The Admin Panel creates customer Auth accounts using a secondary Firebase app, so the admin stays logged in. Customer Login ID is mapped internally to `<loginId>@zenolife.local`.
+Important: publish firestore.rules in Firebase Console. Never upload service-account JSON or private credentials to GitHub.
 
-## Deploy
-For GitHub Pages, upload the web files to a GitHub repository and enable Pages. Add the GitHub Pages domain under Firebase Authentication → Settings → Authorized domains.
 
-Do not upload any service-account JSON/private key to GitHub.
+## Offer rules v8
+- Only a cart/order with a total of at least ₹1500 is a qualifying order.
+- All qualifying orders placed within the same 6-day window count as ONE qualifying order.
+- The first qualifying order starts the 6-day window; a qualifying order after that window starts the next one.
+- 20 qualifying completed orders unlock ₹100 OFF.
+- 40 qualifying completed orders unlock ₹250 OFF.
+- Non-qualifying orders (below ₹1500) do not increase the offer counter.
+- Cancelled orders do not count.
