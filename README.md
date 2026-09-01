@@ -17,13 +17,3 @@ Features:
 - Separate drug details page
 
 Important: publish firestore.rules in Firebase Console. Never upload service-account JSON or private credentials to GitHub.
-
-
-## Offer rules v8
-- Only a cart/order with a total of at least ₹1500 is a qualifying order.
-- All qualifying orders placed within the same 6-day window count as ONE qualifying order.
-- The first qualifying order starts the 6-day window; a qualifying order after that window starts the next one.
-- 20 qualifying completed orders unlock ₹100 OFF.
-- 40 qualifying completed orders unlock ₹250 OFF.
-- Non-qualifying orders (below ₹1500) do not increase the offer counter.
-- Cancelled orders do not count.
