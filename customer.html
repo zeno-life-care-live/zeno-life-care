@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ZenoLife Care • Customer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="blossom-bg">
+<div class="petals" aria-hidden="true"></div>
+<header class="topbar glass">
+  <div class="brand-mini"><span class="logo small">✿</span><div><b>ZenoLife Care</b><small id="medicalName">Customer Portal</small></div></div>
+  <div class="top-actions"><span class="pill" id="customerName"></span><button id="logoutBtn" class="ghost">Logout</button></div>
+</header>
+
+<main class="container">
+  <section class="hero glass">
+    <div>
+      <div class="eyebrow">WELCOME</div>
+      <h1 id="welcome">Your medicines, your order.</h1>
+      <p>Check selling rates and place your order directly with the medical retailer.</p>
+    </div>
+    <div class="hero-flower">✿</div>
+  </section>
+
+  <nav class="tabs glass">
+    <button class="tab active" data-tab="medicines">Medicines</button>
+    <button class="tab" data-tab="orders">Order History</button>
+  </nav>
+
+  <section id="medicinesTab" class="tab-panel">
+    <div class="toolbar glass">
+      <div class="search-wrap">⌕<input id="search" placeholder="Search medicine name..."></div>
+      <button id="refreshBtn" class="ghost">Refresh</button>
+    </div>
+    <div id="medicineGrid" class="medicine-grid"></div>
+    <div id="emptyMedicines" class="empty glass" hidden>No medicines found.</div>
+  </section>
+
+  <section id="ordersTab" class="tab-panel" hidden>
+    <div class="section-title"><div><div class="eyebrow">YOUR ORDERS</div><h2>Order History</h2></div><div id="reward" class="reward"></div></div>
+    <div id="ordersList" class="orders-list"></div>
+  </section>
+</main>
+
+<dialog id="orderDialog" class="dialog">
+  <form method="dialog" id="orderForm" class="dialog-card">
+    <button type="button" class="close" id="closeDialog">×</button>
+    <div class="eyebrow">NEW ORDER</div>
+    <h2 id="orderMedicineName"></h2>
+    <p class="muted">Selling rate: <b id="orderMedicineRate"></b></p>
+    <input type="hidden" id="orderMedicineId">
+    <label>Quantity<input id="orderQty" type="number" min="1" step="1" value="1" required></label>
+    <button class="primary" type="submit">Place Order <span>→</span></button>
+    <p id="orderMsg" class="message"></p>
+  </form>
+</dialog>
+<script type="module" src="customer.js"></script>
+</body>
+</html>
