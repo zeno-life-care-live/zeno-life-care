@@ -82,6 +82,20 @@ function renderChips() {
   });
 }
 
+function expiryValue(m) {
+  return m.expiry || m.expiryDate || "—";
+}
+
+function mrpValue(m) {
+  const v = m.mrp ?? m.MRP ?? m.maximumRetailPrice;
+  return v === null || v === undefined || v === "" ? "—" : money(v);
+}
+
+function quantityValue(m) {
+  const v = m.quantity ?? m.stock;
+  return v === null || v === undefined || v === "" ? "—" : v;
+}
+
 function renderMedicines() {
   if (!$("#medicineGrid")) return;
   const term = ($("#search")?.value || "").toLowerCase().trim();
@@ -101,8 +115,9 @@ function renderMedicines() {
       <h3>${esc(name)}</h3>
       ${m.composition ? `<div class="composition-mini">${esc(m.composition)}</div>` : ""}
       <div class="rate-row"><span>N. Rate</span><b>${money(sellRate(m))}</b></div>
-      <div class="rate-row"><span>Exp.</span><b>N. RATE</b></div>
-      <div class="rate-row"><span>MRP</span><b>N. RATE</b></div>
+      <div class="rate-row"><span>Quantity</span><b>${quantityValue(m)}</b></div>
+      <div class="rate-row"><span>Exp.</span><b>${esc(expiryValue(m))}</b></div>
+      <div class="rate-row"><span>MRP</span><b>${mrpValue(m)}</b></div>
       <div class="card-actions"><button class="ghost" data-details="${esc(m.id)}">Details</button><button class="primary" data-add="${esc(m.id)}" ${!available ? "disabled" : ""}>Add to Cart</button></div>
     </article>`;
   }).join("") : "";
