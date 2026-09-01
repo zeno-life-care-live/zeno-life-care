@@ -4,11 +4,13 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isAdmin() { return signedIn() && request.auth.token.admin == true; }
 
+    // Public customer-safe medicine fields only.
     match /medicines/{medicineId} {
       allow read: if signedIn();
       allow create, update, delete: if isAdmin();
     }
 
+    // Purchase Rate, GST and Transport are strictly Admin-only.
     match /medicinePrivate/{medicineId} {
       allow read, create, update, delete: if isAdmin();
     }
@@ -19,9 +21,28 @@ service cloud.firestore {
     }
 
     match /orders/{orderId} {
-      allow create: if signedIn() && request.resource.data.customerId == request.auth.uid;
-      allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
-      allow update, delete: if isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.customerId == request.auth.uid
+        && request.resource.data.status == 'new'
+        && request.resource.data.quantity > 0
+        && get(/databases/$(database)/documents/medicines/$(request.resource.data.medicineId)).data.available == true
+        && request.resource.data.quantity <= get(/databases/$(database)/documents/medicines/$(request.resource.data.medicineId)).data.quantity;
+
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.customerId == request.auth.uid);
+
+      // Admin can manage status. Customer can only cancel own new/confirmed order.
+      allow update: if isAdmin()
+        || (
+          signedIn()
+          && resource.data.customerId == request.auth.uid
+          && request.resource.data.customerId == resource.data.customerId
+          && request.resource.data.status == 'cancelled'
+          && resource.data.status in ['new', 'confirmed']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        );
+
+      allow delete: if isAdmin();
     }
   }
 }
