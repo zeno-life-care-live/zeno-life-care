@@ -1,71 +1,12 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ZenoLife Care • Customer</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body class="blossom-bg">
-<div class="petals" aria-hidden="true"></div>
-<header class="topbar glass">
-  <div class="brand-mini"><span class="logo small">✿</span><div><b>ZenoLife Care</b><small id="medicalName">Customer Portal</small></div></div>
-  <div class="top-actions"><span class="pill" id="customerName"></span><button id="supportBtn" class="ghost" type="button">Customer Support</button><button id="logoutBtn" class="ghost">Logout</button></div>
-</header>
-
-<main class="container">
-  <section class="hero glass">
-    <div>
-      <div class="eyebrow">WELCOME</div>
-      <h1 id="welcome">Your medicines, your order.</h1>
-      <p>Check selling rates and place your order directly with the medical retailer.</p>
-    </div>
-    <div class="hero-flower">✿</div>
-  </section>
-
-  <nav class="tabs glass">
-    <button class="tab active" data-tab="medicines">Medicines</button>
-    <button class="tab" data-tab="orders">Order History</button>
-  </nav>
-
-  <section id="medicinesTab" class="tab-panel">
-    <div class="toolbar glass">
-      <div class="search-wrap">⌕<input id="search" placeholder="Search medicine name..."></div>
-      <button id="refreshBtn" class="ghost">Refresh</button>
-    </div>
-    <div id="medicineGrid" class="medicine-grid"></div>
-    <div id="emptyMedicines" class="empty glass" hidden>No medicines found.</div>
-  </section>
-
-  <section id="ordersTab" class="tab-panel" hidden>
-    <div class="section-title"><div><div class="eyebrow">YOUR ORDERS</div><h2>Order History</h2></div><div id="reward" class="reward"></div></div>
-    <div id="ordersList" class="orders-list"></div>
-  </section>
-</main>
-
-<dialog id="supportDialog" class="dialog">
-  <div class="dialog-card support-card">
-    <button type="button" class="close" id="closeSupport">×</button>
-    <div class="eyebrow">CUSTOMER SUPPORT</div>
-    <h2>Need help?</h2>
-    <p class="muted">Order ya kisi bhi problem ke liye humse contact karein.</p>
-    <a class="primary support-link" href="tel:9934872568">📞 Call: 9934872568</a>
-    <a class="ghost support-link" href="mailto:bhaiajju44765@gmail.com">✉ Email: bhaiajju44765@gmail.com</a>
-  </div>
-</dialog>
-
-<dialog id="orderDialog" class="dialog">
-  <form method="dialog" id="orderForm" class="dialog-card">
-    <button type="button" class="close" id="closeDialog">×</button>
-    <div class="eyebrow">NEW ORDER</div>
-    <h2 id="orderMedicineName"></h2>
-    <p class="muted">Selling rate: <b id="orderMedicineRate"></b></p>
-    <input type="hidden" id="orderMedicineId">
-    <label>Quantity<input id="orderQty" type="number" min="1" step="1" value="1" required></label>
-    <button class="primary" type="submit">Place Order <span>→</span></button>
-    <p id="orderMsg" class="message"></p>
-  </form>
-</dialog>
-<script type="module" src="customer.js"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZenoLife Care • Customer</title><link rel="stylesheet" href="style.css"></head>
+<body class="blossom-bg"><div class="petals" aria-hidden="true"></div>
+<header class="topbar glass"><div class="brand-mini"><span class="logo small">✿</span><div><b>ZenoLife Care</b><small id="medicalName">Customer Portal</small></div></div><div class="top-actions"><span class="pill" id="customerName"></span><button id="profileBtn" class="ghost">Profile</button><button id="supportBtn" class="ghost">☎ Support</button><button id="cartBtn" class="primary cart-button">Cart <span id="cartCount">0</span></button><button id="logoutBtn" class="ghost">Logout</button></div></header>
+<main class="container"><section class="hero glass"><div><div class="eyebrow">WELCOME</div><h1 id="welcome">Your medicines, your order.</h1><p>Search by drug name or composition and place your order directly with the medical retailer.</p></div><div class="hero-flower">✿</div></section>
+<nav class="tabs glass"><button class="tab active" data-tab="medicines">Medicines</button><button class="tab" data-tab="orders">Order History</button></nav>
+<section id="medicinesTab" class="tab-panel"><div class="toolbar glass"><div class="search-wrap">⌕<input id="search" placeholder="Search medicine or composition..."></div><button id="clearSearch" class="ghost">Clear</button><button id="refreshBtn" class="ghost">Refresh</button></div><div id="categoryChips" class="chips"></div><div id="medicineGrid" class="medicine-grid"></div><div id="emptyMedicines" class="empty glass" hidden>No medicines found.</div></section>
+<section id="ordersTab" class="tab-panel" hidden><div class="section-title"><div><div class="eyebrow">YOUR ORDERS</div><h2>Order History</h2></div><div id="reward" class="reward"></div></div><div id="ordersList" class="orders-list"></div></section></main>
+<div id="toast" class="toast" role="status"></div>
+<dialog id="supportDialog" class="dialog"><div class="dialog-card support-card"><button type="button" class="close" id="closeSupport">×</button><div class="eyebrow">CUSTOMER SUPPORT</div><h2>Need help?</h2><p class="muted">Order ya kisi bhi problem ke liye humse contact karein.</p><a class="primary support-link" href="tel:9934872568">📞 Call: 9934872568</a><a class="ghost support-link" href="mailto:bhaiajju44765@gmail.com">✉ Email: bhaiajju44765@gmail.com</a></div></dialog>
+<dialog id="profileDialog" class="dialog"><form method="dialog" id="profileForm" class="dialog-card"><button type="button" class="close" id="closeProfile">×</button><div class="eyebrow">MY PROFILE</div><h2 id="profileTitle">Customer Profile</h2><p><b id="profileMedical"></b><br><span id="profilePhone" class="muted"></span></p><hr><div class="eyebrow">CHANGE PASSWORD</div><label>Current Password<input id="currentPassword" type="password" minlength="6"></label><label>New Password<input id="newPassword" type="password" minlength="6"></label><button class="primary" type="submit">Update Password</button><p id="profileMsg" class="message"></p></form></dialog>
+<dialog id="cartDialog" class="dialog"><div class="dialog-card wide"><button type="button" class="close" id="closeCart">×</button><div class="eyebrow">YOUR CART</div><h2>Order Summary</h2><div id="cartList"></div><div class="cart-summary"><div><span>Subtotal</span><b id="cartSubtotal">₹0.00</b></div><div class="discount-line"><span>🎁 Bonus</span><b id="cartDiscount">₹0.00</b></div><div class="cart-total"><span>Payable Total</span><b id="cartTotal">₹0.00</b></div></div><p id="rewardCartMsg" class="offer-note"></p><button id="placeCartOrder" class="primary full">Order Now →</button><p id="cartMsg" class="message"></p></div></dialog>
+<script type="module" src="customer.js"></script></body></html>
