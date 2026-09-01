@@ -11,7 +11,7 @@ form.addEventListener("submit", async e => {
     const loginId = document.querySelector("#loginId").value;
     const password = document.querySelector("#password").value;
     await signInWithEmailAndPassword(auth, customerEmailFromLogin(loginId), password);
-    location.href = "customer.html";
+    location.replace("customer.html");
   } catch (err) {
     msg.textContent = "Login failed. Please check your Login ID and password.";
   }
