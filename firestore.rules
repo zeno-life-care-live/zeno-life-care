@@ -1,7 +1,6 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
     function signedIn() { return request.auth != null; }
     function isAdmin() { return signedIn() && request.auth.token.admin == true; }
 
@@ -10,18 +9,19 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    match /medicinePrivate/{medicineId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
     match /customers/{uid} {
       allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
       allow create, update, delete: if isAdmin();
     }
 
     match /orders/{orderId} {
-      allow create: if signedIn()
-        && request.resource.data.customerId == request.auth.uid;
-      allow read: if isAdmin()
-        || (signedIn() && resource.data.customerId == request.auth.uid);
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow create: if signedIn() && request.resource.data.customerId == request.auth.uid;
+      allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
+      allow update, delete: if isAdmin();
     }
   }
 }
