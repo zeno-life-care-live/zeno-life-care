@@ -34,12 +34,12 @@ function renderMedicines() {
   $("#medicineGrid").innerHTML = list.map(m => `
     <article class="medicine-card glass">
       <div class="stock-dot ${m.available && Number(m.quantity)>0 ? "on":"off"}"></div>
+      ${m.imageData ? `<img class="medicine-image" src="${m.imageData}" alt="${esc(m.name)}">` : `<div class="medicine-image placeholder">✿</div>`}
       <div class="med-top"><span class="med-icon">✿</span><span class="stock-label">${m.available && Number(m.quantity)>0 ? "Available":"Not available"}</span></div>
       <h3>${esc(m.name)}</h3>
-      <div class="rate-row"><span>Sell Rate</span><b>${money(m.sellRate)}</b></div>
-      <div class="rate-row muted-row"><span>Quantity</span><b>N. RATE</b></div>
-      <div class="rate-row muted-row"><span>Expiry</span><b>N. RATE</b></div>
-      <div class="rate-row muted-row"><span>MRP</span><b>N. RATE</b></div>
+      <div class="rate-row"><span>N. Rate</span><b>${money(m.sellRate)}</b></div>
+      <div class="rate-row"><span>Exp.</span><b>${esc(m.expiry || "-")}</b></div>
+      <div class="rate-row"><span>MRP</span><b>${money(m.mrp)}</b></div>
       <button class="primary full" ${!(m.available && Number(m.quantity)>0) ? "disabled":""} data-order="${m.id}">Order Now</button>
     </article>`).join("");
   $("#emptyMedicines").hidden = list.length !== 0;
@@ -104,6 +104,8 @@ $("#search").addEventListener("input", renderMedicines);
 $("#refreshBtn").onclick = loadMedicines;
 $("#logoutBtn").onclick = () => signOut(auth).then(()=>location.href="index.html");
 $("#closeDialog").onclick = () => $("#orderDialog").close();
+$("#supportBtn").onclick = () => $("#supportDialog").showModal();
+$("#closeSupport").onclick = () => $("#supportDialog").close();
 
 document.querySelectorAll(".tab").forEach(tab => tab.onclick = () => {
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
