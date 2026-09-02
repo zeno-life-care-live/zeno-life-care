@@ -4,10 +4,43 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebas
 import { collection,doc,getDoc,getDocs,addDoc,setDoc,updateDoc,deleteDoc,query,where,serverTimestamp,runTransaction,onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 const $=s=>document.querySelector(s),money=n=>`₹${Number(n||0).toFixed(2)}`,esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 let medicines=[],customers=[],orders=[],blacklistRequests=[],unsubscribeOrders=null;const customerApp=initializeApp(firebaseConfig,"zeno-customer-creator-v2"),customerAuth=getAuth(customerApp);
-function notify(msg){$("#toast").textContent=msg;$("#toast").classList.add("show");setTimeout(()=>$("#toast").classList.remove("show"),2600);if("Notification"in window&&Notification.permission==="granted")new Notification("ZenoLife Care",{body:msg})}
-async function requestNotifications(){if("Notification"in window&&Notification.permission==="default")try{await Notification.requestPermission()}catch{}}
+function notify(msg){
+  const toast=$("#toast");
+  if(toast){toast.textContent=msg;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2600)}
+  showAdminNotification(msg);
+}
+
+async function showAdminNotification(msg){
+  try{
+    if(!('Notification' in window) || Notification.permission!=="granted") return;
+    if(!('serviceWorker' in navigator)) return;
+    const reg=await navigator.serviceWorker.ready;
+    if(reg && reg.showNotification){
+      await reg.showNotification("Zeno Life Care",{body:msg,icon:"./favicon.ico",badge:"./favicon.ico",tag:"zeno-admin"});
+    }
+  }catch(_){
+    // Android Chrome does not allow `new Notification()` in many contexts.
+    // Notification failure must never break order/status operations.
+  }
+}
+
+async function registerNotificationServiceWorker(){
+  try{
+    if('serviceWorker' in navigator){
+      await navigator.serviceWorker.register('./service-worker.js');
+    }
+  }catch(_){
+    // Notifications are optional; the dashboard continues normally.
+  }
+}
+
+async function requestNotifications(){
+  if('Notification' in window && Notification.permission==="default"){
+    try{await Notification.requestPermission()}catch{}
+  }
+}
 if($("#adminLoginForm"))$("#adminLoginForm").addEventListener("submit",async e=>{e.preventDefault();$("#adminLoginMsg").textContent="Signing in…";try{const cred=await signInWithEmailAndPassword(auth,$("#adminEmail").value.trim(),$("#adminPassword").value);const token=await getIdTokenResult(cred.user,true);if(token.claims.admin!==true){await signOut(auth);$("#adminLoginMsg").textContent="⚠ This is an Admin page. Only authorized Admin accounts can login here.";return}location.replace("admin-dashboard.html")}catch{$("#adminLoginMsg").textContent="⚠ This is an Admin page. Only authorized Admin accounts can login here, or the credentials are incorrect."}});
-onAuthStateChanged(auth,async user=>{if(!user){if(location.pathname.endsWith("admin-dashboard.html"))location.replace("admin.html");return}if(location.pathname.endsWith("admin.html")){location.replace("admin-dashboard.html");return}try{const t=await getIdTokenResult(user,true);if(t.claims.admin!==true)throw 0;if($("#adminApp")){await requestNotifications();await loadAll();watchOrders();restoreTab()}}catch{await signOut(auth);location.replace("admin.html")}});
+onAuthStateChanged(auth,async user=>{if(!user){if(location.pathname.endsWith("admin-dashboard.html"))location.replace("admin.html");return}if(location.pathname.endsWith("admin.html")){location.replace("admin-dashboard.html");return}try{const t=await getIdTokenResult(user,true);if(t.claims.admin!==true)throw 0;if($("#adminApp")){await registerNotificationServiceWorker();await requestNotifications();await loadAll();watchOrders();restoreTab()}}catch{await signOut(auth);location.replace("admin.html")}});
 async function loadAll(){await Promise.all([loadMedicines(),loadCustomers(),loadOrders(),loadBlacklistRequests()]);stats()}
 async function loadMedicines(){const s=await getDocs(collection(db,"medicines")),p=await getDocs(collection(db,"medicinePrivate")),pm=new Map(p.docs.map(d=>[d.id,d.data()]));medicines=s.docs.map(d=>({id:d.id,...d.data(),...(pm.get(d.id)||{})}));renderMedicines()}
 async function loadCustomers(){const s=await getDocs(collection(db,"customers"));customers=s.docs.map(d=>({id:d.id,...d.data()}));renderCustomers()}
