@@ -1,18 +1,6 @@
-import { auth, customerEmailFromLogin } from "./firebase.js";
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-const form = document.querySelector("#loginForm");
-const msg = document.querySelector("#loginMsg");
-
-form.addEventListener("submit", async e => {
-  e.preventDefault();
-  msg.textContent = "Signing in…";
-  try {
-    const loginId = document.querySelector("#loginId").value;
-    const password = document.querySelector("#password").value;
-    await signInWithEmailAndPassword(auth, customerEmailFromLogin(loginId), password);
-    location.replace("customer.html");
-  } catch (err) {
-    msg.textContent = "Login failed. Please check your Login ID and password.";
-  }
-});
+import {auth,db,customerEmailFromLogin} from "./firebase.js";
+import {signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import {doc,getDoc,collection,addDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+const form=document.querySelector("#loginForm"),msg=document.querySelector("#loginMsg"),box=document.querySelector("#blacklistBox"),req=document.querySelector("#requestAdminBtn"),reqMsg=document.querySelector("#requestMsg");
+form.addEventListener("submit",async e=>{e.preventDefault();msg.textContent="Signing in…";try{const loginId=document.querySelector("#loginId").value.trim(),password=document.querySelector("#password").value;await signInWithEmailAndPassword(auth,customerEmailFromLogin(loginId),password);const s=await getDoc(doc(db,"customers",auth.currentUser.uid));if(s.exists()&&s.data().active===false){box.hidden=false;msg.textContent="";return}location.replace("customer.html")}catch(e){msg.textContent="Login failed. Please check your Login ID and password."}});
+req?.addEventListener("click",async()=>{try{await addDoc(collection(db,"blacklistRequests"),{customerId:auth.currentUser.uid,loginId:document.querySelector("#loginId").value.trim().toLowerCase(),status:"pending",createdAt:serverTimestamp()});reqMsg.textContent="Request sent to Admin ✓"}catch(e){reqMsg.textContent="Could not send request."}});
