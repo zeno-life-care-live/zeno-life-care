@@ -33,6 +33,10 @@ service cloud.firestore {
       allow delete: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
     }
 
+    match /bills/{billId} {
+      allow create, read, update, delete: if isAdmin();
+    }
+
     match /blacklistRequests/{requestId} {
       allow create: if signedIn() && request.resource.data.customerId == request.auth.uid;
       allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
